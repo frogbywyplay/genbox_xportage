@@ -1,0 +1,12 @@
+#!/usr/bin/python
+#
+# Copyright (C) 2006-2013 Wyplay, All Rights Reserved.
+#
+
+from xportage import xexec
+import sys
+
+if __name__ == "__main__":
+        sys.argv[0] = r'/usr/bin/portageq'
+        xexec(sys.argv)
+

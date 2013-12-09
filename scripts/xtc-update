@@ -1,0 +1,14 @@
+#!/usr/bin/python
+#
+# Copyright (C) 2006-2013 Wyplay, All Rights Reserved.
+#
+
+from xportage import xexec
+import sys, os
+
+if __name__ == "__main__":
+        sys.argv[0] = r'/usr/sbin/etc-update'
+        env = os.environ.copy()
+        env['ETC_UPDATE_CONFIG'] = '/etc/etc-update.conf'
+        xexec(cmd=sys.argv, env=env)
+

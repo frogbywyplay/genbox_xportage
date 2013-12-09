@@ -1,0 +1,35 @@
+#!/usr/bin/python
+#
+# Copyright (C) 2006-2013 Wyplay, All Rights Reserved.
+#
+
+from xportage import xexec
+import sys, os
+
+if __name__ == "__main__":
+        sys.argv[0] = r'/usr/bin/emerge'
+        env = os.environ.copy()
+
+        if len(sys.argv) > 1:
+                debug = False
+                poped = 0
+                for arg_num, arg in enumerate(sys.argv[1:-1]):
+                        if arg in [ '--debug', '-d' ]:
+                                sys.argv.pop(arg_num + 1 - poped)
+                                poped += 1
+                                debug = True
+                        elif (len(arg) > 2) and (arg[0] == '-') and (arg[1] != '-'):
+                                i = arg.find('d')
+                                if i < 0:
+                                        continue
+                                sys.argv[arg_num + 1 - poped] = arg[:i] + arg[i + 1:]
+                                debug = True
+                if debug:
+                        env['FEATURES'] = os.getenv('FEATURES', '') + ' splitdebug'
+                        env['CFLAGS_USER'] = os.getenv('CFLAGS_USER', '') + ' -g -ggdb -funwind-tables'
+                        env['CXXFLAGS_USER'] = os.getenv('CXXFLAGS_USER', '') + ' -g -ggdb -funwind-tables'
+                        env['CFLAGS_USER_POST'] = os.getenv('CFLAGS_USER_POST', '-O0')
+                        env['CXXFLAGS_USER_POST'] = os.getenv('CXXFLAGS_USER_POST', '-O0')
+                        env['LDFLAGS_USER'] = os.getenv('LDFLAGS_USER', '') + ' -rdynamic'
+        xexec(sys.argv, env=env)
+

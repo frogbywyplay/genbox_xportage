@@ -1,0 +1,18 @@
+#!/usr/bin/python
+#
+# Copyright (C) 2006-2013 Wyplay, All Rights Reserved.
+#
+
+from xportage import xexec
+import os, sys
+
+if __name__ == "__main__":
+        exe_name = os.path.basename(sys.argv[0])
+        if exe_name == "xexec":
+                cmd = sys.argv[1:]
+        else:
+                cmd = sys.argv
+                if exe_name[0] == 'x':
+                        cmd[0] = os.path.dirname(sys.argv[0]) + "/" + exe_name[1:]
+        xexec(cmd)
+
