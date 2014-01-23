@@ -91,7 +91,7 @@ def find_packages(dir):
 
 setup(
     name = "xportage",
-    version = "2.1.4",
+    version = "2.1.5",
     description = "Xportage tools for genbox",
     author = "Wyplay",
     author_email = "noreply@wyplay.com",
