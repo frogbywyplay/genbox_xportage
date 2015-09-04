@@ -51,7 +51,7 @@ class xportageTester(unittest.TestCase):
                 p = xportage.XPortage()
                 p.parse_config(CONFIG1)
                 self.failUnlessEqual(p.config["ARCH"], 'sh')
-                self.failUnlessEqual(p.config["PORTDIR"], "%s/portage/targets" % p.root)
+                self.failUnlessEqual(os.path.normpath(p.config["PORTDIR"]), os.path.normpath("%s/portage/targets" % p.root))
                 del p
 
         def testTrees(self):

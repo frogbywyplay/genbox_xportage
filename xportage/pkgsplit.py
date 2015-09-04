@@ -19,6 +19,5 @@
 #
 
 import sys
-sys.path.insert(0, "/usr/lib/portage/pym")
-from portage_versions import pkgsplit, ver_regexp, vercmp, pkgcmp
+from portage.versions import pkgsplit, ver_regexp, vercmp, pkgcmp
 

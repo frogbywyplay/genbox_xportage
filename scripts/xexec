@@ -8,7 +8,7 @@ import os, sys
 
 if __name__ == "__main__":
         exe_name = os.path.basename(sys.argv[0])
-        if exe_name == "xexec":
+        if exe_name == "xexec" or exe_name == "xexec-%s" % os.path.basename(sys.executable):
                 cmd = sys.argv[1:]
         else:
                 cmd = sys.argv

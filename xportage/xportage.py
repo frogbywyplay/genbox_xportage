@@ -20,12 +20,11 @@
 
 import os, sys
 
-sys.path.insert(0, "/usr/lib/portage/pym")
 os.environ["PORTAGE_LEGACY_GLOBALS"] = "false"
 import portage
-from portage_const import INCREMENTALS
-from portage_util import LazyItemsDict
-import portage_exception
+from portage.const import INCREMENTALS
+from portage.util import LazyItemsDict
+import portage.exception
 del os.environ["PORTAGE_LEGACY_GLOBALS"]
 
 from exceptions import Exception
