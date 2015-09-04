@@ -116,8 +116,11 @@ setup(
     scripts = [
                "scripts/xbuild",
                "scripts/xexec",
+               "scripts/xlayman",
                "scripts/xmerge",
                "scripts/xportageq",
+               "scripts/xquery",
+               "scripts/xselect",
                "scripts/xtc-update",
               ],
     long_description = """xportage for Portage interface with xutils tools""",

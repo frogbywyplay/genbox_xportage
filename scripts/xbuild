@@ -1,35 +1,13 @@
-#!/usr/bin/python
-#
-# Copyright (C) 2006-2013 Wyplay, All Rights Reserved.
-#
+#!/bin/bash
 
-from xportage import xexec
-from xtarget import get_current_target
-from xutils.output import info
+pushd /usr/targets/ &> /dev/null
+: ${CURRENT_TARGET:=$(readlink current)}
+popd &> /dev/null
 
-import sys, os
+: ${ROOT:="/usr/targets/${CURRENT_TARGET}/root"}
+: ${PORTAGE_CONFIGROOT:=${ROOT}}
+: ${PORTAGE_TMPDIR:="/usr/targets/${CURRENT_TARGET}/xbuild"}
+EBUILD=`which ebuild 2> /dev/null` || { echo "ebuild not found in ${PATH}"; exit 1; }
 
-if __name__ == "__main__":
-        sys.argv[0] = r'/usr/bin/ebuild'
-        env = os.environ.copy()
-        if not env.has_key("BUILD_PREFIX"):
-                env["BUILD_PREFIX"] = get_current_target() + "/work"
-        env["PORT_LOGDIR"] = ""
-        env["SCM_WORKDIR"] = 'True'
-
-        if len(sys.argv) > 1 and sys.argv[1].endswith('.ebuild'):
-                ebuild = os.path.abspath(sys.argv[1])
-                category = os.path.basename(os.path.dirname(os.path.dirname(ebuild)))
-                ebuild = os.path.basename(ebuild)[:-7]
-                portage_builddir ="%s/%s/%s" % (env["BUILD_PREFIX"], category, ebuild)
-                for step, file in [
-                                        ('install', "%s/.installed" % portage_builddir),
-                                        ('compile', "%s/.compiled" % portage_builddir)
-                                  ]:
-                        if step in sys.argv and os.path.exists(file):
-                                info("\'%s\' called explicitly, removing %s lock file" %
-                                        (step, os.path.basename(file)))
-                                os.unlink(file)
-
-        xexec(cmd=sys.argv, env=env)
-
+[[ -d "${PORTAGE_TMPDIR}" ]] || mkdir -p ${PORTAGE_TMPDIR}
+ROOT=${ROOT} PORTAGE_CONFIGROOT=${PORTAGE_CONFIGROOT} PORTAGE_TMPDIR=${PORTAGE_TMPDIR} ${EBUILD} "$@"

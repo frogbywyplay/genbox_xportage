@@ -1,0 +1,11 @@
+#!/bin/bash
+
+pushd /usr/targets/ &> /dev/null
+: ${CURRENT_TARGET:=$(readlink current)}
+popd &> /dev/null
+
+: ${ROOT:="/usr/targets/${CURRENT_TARGET}/root"}
+: ${PORTAGE_CONFIGROOT:=${ROOT}}
+ESELECT=`which eselect 2> /dev/null` || { echo "eselect not found in ${PATH}"; exit 1; }
+
+ROOT=${ROOT} PORTAGE_CONFIGROOT=${PORTAGE_CONFIGROOT} ${ESELECT} "$@"

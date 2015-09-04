@@ -1,0 +1,10 @@
+#!/bin/bash
+
+pushd /usr/targets/ &> /dev/null
+: ${CURRENT_TARGET:=$(readlink current)}
+popd &> /dev/null
+
+: ${ROOT:="/usr/targets/${CURRENT_TARGET}/root"}
+LAYMAN=`which layman 2> /dev/null` || { echo "layman not found in ${PATH}"; exit 1; }
+
+${LAYMAN} --config=${ROOT}/etc/xlayman.cfg "$@"
