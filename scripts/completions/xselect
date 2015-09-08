@@ -1,0 +1,11 @@
+# Gentoo Linux Bash Shell Command Completion
+#
+# Copyright 1999-2013 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License, v2 or later
+
+_xselect()
+{
+    _init_completion || return
+    _xfunc eselect _eselect
+} && 
+complete -F _xselect xselect
