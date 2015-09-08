@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2014 Wyplay, All Rights Reserved.
+# Copyright (C) 2006-2015 Wyplay, All Rights Reserved.
 # This file is part of xportage.
 # 
 # xportage is free software: you can redistribute it and/or modify
