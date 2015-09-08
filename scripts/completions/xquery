@@ -1,0 +1,11 @@
+# Gentoo Linux Bash Shell Command Completion
+#
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License, v2 or later
+
+_xquery()
+{
+    _init_completion || return
+    _xfunc equery _equery
+} && 
+complete -F _xquery xquery
