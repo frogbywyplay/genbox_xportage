@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pushd /usr/targets/ &> /dev/null
-: ${CURRENT_TARGET:=$(readlink current)}
+: ${CURRENT_TARGET:=`basename $(readlink current)`}
 popd &> /dev/null
 
 : ${ROOT:="/usr/targets/${CURRENT_TARGET}/root"}

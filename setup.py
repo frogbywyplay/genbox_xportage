@@ -107,7 +107,7 @@ def find_packages(dir):
 
 setup(
     name = "xportage",
-    version = "2.2.0",
+    version = "2.2.1",
     description = "Xportage tools for genbox",
     author = "Wyplay",
     author_email = "noreply@wyplay.com",
@@ -123,6 +123,7 @@ setup(
                "scripts/xselect",
                "scripts/xtc-update",
               ],
+    data_files = [('/etc/layman', ["config/xlayman.cfg"])]
     long_description = """xportage for Portage interface with xutils tools""",
     cmdclass = { 'test' : TestCommand }
 ) 
