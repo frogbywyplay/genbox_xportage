@@ -123,7 +123,7 @@ setup(
                "scripts/xselect",
                "scripts/xtc-update",
               ],
-    data_files = [('/etc/layman', ["config/xlayman.cfg"])]
+    data_files = [('/etc/layman', ["config/xlayman.cfg"])],
     long_description = """xportage for Portage interface with xutils tools""",
     cmdclass = { 'test' : TestCommand }
 ) 
