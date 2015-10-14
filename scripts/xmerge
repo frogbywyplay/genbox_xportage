@@ -15,7 +15,7 @@ def check_profile(params):
     for arg in params[1:]:
         if arg == '--nocheck':
             params.remove('--nocheck')
-            print colorize('green', '* Skip profile checking.')
+            print colorize('darkgreen', 'Skip profile checking.')
             return
         if not arg.startswith('-'):
             pkg_list.append(arg)
@@ -27,6 +27,7 @@ def check_profile(params):
     p = ProfileChecker(target + '/root')
     p.parse()
     for pkg in pkg_list:
+        print colorize('darkgreen', 'Check profile for %s.' % pkg)
         (has_warnings, has_errors) = p.check_installed_versions(pkg, False)
         if has_errors:
             print colorize('red', '* Fix your profile and retry.')
