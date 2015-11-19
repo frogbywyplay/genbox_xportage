@@ -5,6 +5,7 @@
 
 from portage.output import colorize
 from profilechecker.checker import ProfileChecker
+from subprocess import Popen
 from xportage import xexec
 from xtarget.current import get_current_target
 import sys, os
@@ -33,9 +34,23 @@ def check_profile(params):
             print colorize('red', '* Fix your profile and retry.')
             sys.exit(1)
 
+def unmask(package):
+    unmask_file = get_current_target() + '/root/etc/portage/package.unmask'
+    if os.path.exists(unmask_file) and os.path.isdir(unmask_file):
+        unmask_file += '/target'
+    f = open(unmask_file, 'w')
+    f.write(package + '\n')
+    f.close()
+
 if __name__ == "__main__":
     sys.argv[0] = r'/usr/bin/emerge'
+    unmask(package=str())
     env = os.environ.copy()
+    ignore_version = False
+
+    if 'nopackages' in os.getenv('FEATURES', ''):
+        env['FEATURES'] = os.getenv('FEATURES').replace('nopackages', '').strip()
+        ignore_version = True
 
     if len(sys.argv) > 1:
         debug = False
@@ -45,12 +60,21 @@ if __name__ == "__main__":
                 sys.argv.pop(arg_num + 1 - poped)
                 poped += 1
                 debug = True
+                continue
+            elif arg in ['--ignore-profile-version', '-I']:
+                sys.argv.pop(arg_num + 1 - poped)
+                poped += 1
+                ignore_version = True
+                continue
             elif (len(arg) > 2) and (arg[0] == '-') and (arg[1] != '-'):
                 i = arg.find('d')
-                if i < 0:
-                    continue
-                sys.argv[arg_num + 1 - poped] = arg[:i] + arg[i + 1:]
-                debug = True
+                if i > 0:
+                    sys.argv[arg_num + 1 - poped] = arg[:i] + arg[i + 1:]
+                    debug = True
+                i = arg.find('I')
+                if i > 0:
+                    sys.argv[arg_num + 1 - poped] = arg[:i] + arg[i + 1:]
+                    ignore_version = True
         if debug:
             env['FEATURES'] = os.getenv('FEATURES', '') + ' splitdebug'
             env['CFLAGS_USER'] = os.getenv('CFLAGS_USER', '') + ' -g -ggdb -funwind-tables'
@@ -59,6 +83,18 @@ if __name__ == "__main__":
             env['CXXFLAGS_USER_POST'] = os.getenv('CXXFLAGS_USER_POST', '-O0')
             env['LDFLAGS_USER'] = os.getenv('LDFLAGS_USER', '') + ' -rdynamic'
 
-    check_profile(sys.argv)
-    xexec(sys.argv, env=env)
+    current_target = get_current_target()
+    env['PORTAGE_CONFIGROOT'] = current_target + "/root/"
+    env['ROOT'] = current_target + "/root/"
 
+    if ignore_version:
+        unmask(package='*/*')
+    else:
+        check_profile(sys.argv)
+
+    process = Popen(sys.argv, env=env)
+    (stdout, stderr) = process.communicate()
+
+    unmask(package=str())
+
+    sys.exit(process.returncode)
