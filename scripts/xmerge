@@ -1,35 +1,64 @@
 #!/usr/bin/python
 #
-# Copyright (C) 2006-2013 Wyplay, All Rights Reserved.
+# Copyright (C) 2006-2015 Wyplay, All Rights Reserved.
 #
 
+from portage.output import colorize
+from profilechecker.checker import ProfileChecker
 from xportage import xexec
+from xtarget.current import get_current_target
 import sys, os
 
-if __name__ == "__main__":
-        sys.argv[0] = r'/usr/bin/emerge'
-        env = os.environ.copy()
+def check_profile(params):
+    pkg_list = list()
 
-        if len(sys.argv) > 1:
-                debug = False
-                poped = 0
-                for arg_num, arg in enumerate(sys.argv[1:-1]):
-                        if arg in [ '--debug', '-d' ]:
-                                sys.argv.pop(arg_num + 1 - poped)
-                                poped += 1
-                                debug = True
-                        elif (len(arg) > 2) and (arg[0] == '-') and (arg[1] != '-'):
-                                i = arg.find('d')
-                                if i < 0:
-                                        continue
-                                sys.argv[arg_num + 1 - poped] = arg[:i] + arg[i + 1:]
-                                debug = True
-                if debug:
-                        env['FEATURES'] = os.getenv('FEATURES', '') + ' splitdebug'
-                        env['CFLAGS_USER'] = os.getenv('CFLAGS_USER', '') + ' -g -ggdb -funwind-tables'
-                        env['CXXFLAGS_USER'] = os.getenv('CXXFLAGS_USER', '') + ' -g -ggdb -funwind-tables'
-                        env['CFLAGS_USER_POST'] = os.getenv('CFLAGS_USER_POST', '-O0')
-                        env['CXXFLAGS_USER_POST'] = os.getenv('CXXFLAGS_USER_POST', '-O0')
-                        env['LDFLAGS_USER'] = os.getenv('LDFLAGS_USER', '') + ' -rdynamic'
-        xexec(sys.argv, env=env)
+    for arg in params[1:]:
+        if arg == '--nocheck':
+            params.remove('--nocheck')
+            print colorize('darkgreen', 'Skip profile checking.')
+            return
+        if not arg.startswith('-'):
+            pkg_list.append(arg)
+
+    target = get_current_target()
+    if target is None:
+        print colorize('red', '* Unable to find current target.')
+        sys.exit(1)
+    p = ProfileChecker(target + '/root')
+    p.parse()
+    for pkg in pkg_list:
+        print colorize('darkgreen', 'Check profile for %s.' % pkg)
+        (has_warnings, has_errors) = p.check_installed_versions(pkg, False)
+        if has_errors:
+            print colorize('red', '* Fix your profile and retry.')
+            sys.exit(1)
+
+if __name__ == "__main__":
+    sys.argv[0] = r'/usr/bin/emerge'
+    env = os.environ.copy()
+
+    if len(sys.argv) > 1:
+        debug = False
+        poped = 0
+        for arg_num, arg in enumerate(sys.argv[1:-1]):
+            if arg in [ '--debug', '-d' ]:
+                sys.argv.pop(arg_num + 1 - poped)
+                poped += 1
+                debug = True
+            elif (len(arg) > 2) and (arg[0] == '-') and (arg[1] != '-'):
+                i = arg.find('d')
+                if i < 0:
+                    continue
+                sys.argv[arg_num + 1 - poped] = arg[:i] + arg[i + 1:]
+                debug = True
+        if debug:
+            env['FEATURES'] = os.getenv('FEATURES', '') + ' splitdebug'
+            env['CFLAGS_USER'] = os.getenv('CFLAGS_USER', '') + ' -g -ggdb -funwind-tables'
+            env['CXXFLAGS_USER'] = os.getenv('CXXFLAGS_USER', '') + ' -g -ggdb -funwind-tables'
+            env['CFLAGS_USER_POST'] = os.getenv('CFLAGS_USER_POST', '-O0')
+            env['CXXFLAGS_USER_POST'] = os.getenv('CXXFLAGS_USER_POST', '-O0')
+            env['LDFLAGS_USER'] = os.getenv('LDFLAGS_USER', '') + ' -rdynamic'
+
+    check_profile(sys.argv)
+    xexec(sys.argv, env=env)
 
