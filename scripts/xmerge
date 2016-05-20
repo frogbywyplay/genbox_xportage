@@ -46,6 +46,9 @@ if __name__ == "__main__":
     if not os.geteuid() == 0:
         print colorize('red', '* %s must be run with root credentials.' % sys.argv[0])
         sys.exit(1)
+    if get_current_target() is None:
+        print colorize('red', '* No target found. Install a target using xtarget before running %s.' % sys.argv[0])
+        sys.exit(1)
     sys.argv[0] = r'/usr/bin/emerge'
     unmask(package=str())
     env = os.environ.copy()
