@@ -3,8 +3,10 @@
 # Copyright (C) 2006-2015 Wyplay, All Rights Reserved.
 #
 
+from portage import config
 from portage.output import colorize
 from profilechecker.checker import ProfileChecker
+from profilechecker.package import Package, Packages, PackagesFile, PackageMaskFile, PackageUnmaskFile
 from subprocess import Popen
 from xportage import xexec
 from xtarget.current import get_current_target
@@ -25,7 +27,32 @@ def check_profile(params):
     if target is None:
         print colorize('red', '* Unable to find current target.')
         sys.exit(1)
-    p = ProfileChecker(target + '/root')
+
+    myroot = '%s/root' % target
+    cfg = config(config_root=unicode(myroot), target_root=unicode(myroot))
+    for directory in cfg.profiles:
+        mask_pkgs = Packages()
+        unmask_pkgs = Packages()
+        pf = PackagesFile(directory)
+        for package in pf.list_pkgs().list():
+            if package.version:
+                if package.operator == '=' and not package.removal:
+                    mask_pkgs += Package(package.name, version=package.version, operator='>')
+                if package.operator == '=' and package.removal:
+                    lowest_version = str()
+                    for pkg in pf.list_pkgs().lookup(package.name):
+                        lowest_version = package.version if vercmp(package.version, pkg.version) <= 0 else pkg.version
+                    if package.version == lowest_version:
+                        continue
+                    else:
+                        unmask_pkgs += Package(package.name, version=lowest_version, operator='<=')
+
+        pm = PackageMaskFile(directory)
+        pm.update(mask_pkgs)
+        pu = PackageUnmaskFile(directory)
+        pu.update(unmask_pkgs)
+
+    p = ProfileChecker(myroot)
     p.parse()
     for pkg in pkg_list:
         print colorize('darkgreen', 'Check profile for %s.' % pkg)
