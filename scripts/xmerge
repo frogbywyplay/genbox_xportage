@@ -1,8 +1,9 @@
 #!/usr/bin/python
 #
-# Copyright (C) 2006-2015 Wyplay, All Rights Reserved.
+# Copyright (C) 2006-2016 Wyplay, All Rights Reserved.
 #
 
+from _emerge.main import parse_opts
 from portage import config
 from portage.output import colorize
 from portage.versions import vercmp
@@ -14,16 +15,6 @@ from xtarget.current import get_current_target
 import sys, os
 
 def check_profile(params):
-    pkg_list = list()
-
-    for arg in params[1:]:
-        if arg == '--nocheck':
-            params.remove('--nocheck')
-            print colorize('darkgreen', 'Skip profile checking.')
-            return
-        if not arg.startswith('-'):
-            pkg_list.append(arg)
-
     target = get_current_target()
     if target is None:
         print colorize('red', '* Unable to find current target.')
@@ -53,14 +44,19 @@ def check_profile(params):
         pu = PackageUnmaskFile(directory)
         pu.update(unmask_pkgs)
 
-    p = ProfileChecker(myroot)
-    p.parse()
-    for pkg in pkg_list:
-        print colorize('darkgreen', 'Check profile for %s.' % pkg)
-        (has_warnings, has_errors) = p.check_installed_versions(pkg, False)
-        if has_errors:
-            print colorize('red', '* Fix your profile and retry.')
-            sys.exit(1)
+    action, option, pkg_list = parse_opts(params[1:])
+    if action is None:
+        try:
+            option['--pretend']
+        except KeyError:
+            p = ProfileChecker(myroot)
+            p.parse()
+            for pkg in pkg_list:
+                print colorize('darkgreen', 'Check profile for %s.' % pkg)
+                (has_warnings, has_errors) = p.check_installed_versions(pkg, False)
+                if has_errors:
+                    print colorize('red', '* Fix your ebuild and retry.')
+                    sys.exit(1)
 
 def unmask(package):
     unmask_file = get_current_target() + '/root/etc/portage/package.unmask'

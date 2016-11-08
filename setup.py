@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (C) 2006-2014 Wyplay, All Rights Reserved.
+# Copyright (C) 2006-2016 Wyplay, All Rights Reserved.
 # This file is part of xportage.
 # 
 # xportage is free software: you can redistribute it and/or modify
@@ -107,7 +107,7 @@ def find_packages(dir):
 
 setup(
     name = "xportage",
-    version = "2.3.4",
+    version = "2.3.5",
     description = "Xportage tools for genbox",
     author = "Wyplay",
     author_email = "noreply@wyplay.com",
