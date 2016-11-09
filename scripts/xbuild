@@ -10,4 +10,4 @@ popd &> /dev/null
 EBUILD=`which ebuild 2> /dev/null` || { echo "ebuild not found in ${PATH}"; exit 1; }
 
 [[ -d "${PORTAGE_TMPDIR}" ]] || mkdir -p ${PORTAGE_TMPDIR}
-ROOT=${ROOT} PORTAGE_CONFIGROOT=${PORTAGE_CONFIGROOT} PORTAGE_TMPDIR=${PORTAGE_TMPDIR} SCM_WORKDIR="True" ${EBUILD} "$@"
+ROOT=${ROOT} PORTAGE_CONFIGROOT=${PORTAGE_CONFIGROOT} PORTAGE_TMPDIR=${PORTAGE_TMPDIR} SCM_WORKDIR="True" ${EBUILD} --skip-manifest "$@"
