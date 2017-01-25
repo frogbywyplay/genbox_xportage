@@ -1,0 +1,24 @@
+#!/usr/bin/python2.7
+
+from argparse import ArgumentParser
+from os import getenv
+from os.path import exists
+from portage import config
+from sys import exit
+
+
+parser = ArgumentParser(description = 'Display stacked profile')
+parser.add_argument('-H', '--host', action = 'store_true', help = 'Display host stacked profile')
+args = parser.parse_args()
+
+target_root = str()
+if args.host:
+    target_root = '/'
+else:
+    target_root = '/usr/targets/%s/root' % getenv('CURRENT_TARGET', 'current')
+    if not exists(target_root):
+        print '%s does not exist.' % target_root
+        exit(1)
+
+print 'Stacked profile for %s:' % target_root
+for d in config(config_root = target_root, target_root = target_root).profiles: print d
