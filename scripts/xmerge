@@ -31,13 +31,11 @@ def check_profile(params):
                 if package.operator == '=' and not package.removal:
                     mask_pkgs += Package(package.name, version=package.version, operator='>')
                 if package.operator == '=' and package.removal:
-                    lowest_version = str()
+                    highest_version = str()
                     for pkg in pf.list_pkgs().lookup(package.name):
-                        lowest_version = package.version if vercmp(package.version, pkg.version) <= 0 else pkg.version
-                    if package.version == lowest_version:
-                        continue
-                    else:
-                        unmask_pkgs += Package(package.name, version=lowest_version, operator='<=')
+                        highest_version = package.version if vercmp(package.version, pkg.version) >= 0 else pkg.version
+                    if package.version != highest_version:
+                        unmask_pkgs += Package(package.name, version=highest_version, operator='<=')
 
         pm = PackageMaskFile(directory)
         pm.update(mask_pkgs)
