@@ -7,4 +7,10 @@ popd &> /dev/null
 : ${ROOT:="/usr/targets/${CURRENT_TARGET}/root"}
 LAYMAN=`which layman 2> /dev/null` || { echo "layman not found in ${PATH}"; exit 1; }
 
-${LAYMAN} --config=${ROOT}/etc/xlayman.cfg "$@"
+XMLLIST=""
+# Create xml list to enable
+for xmlfile in ${ROOT}/etc/layman/overlays/*.xml ; do
+    XMLLIST="${XMLLIST} -o file://${xmlfile}"
+done
+
+${LAYMAN} --config=${ROOT}/etc/xlayman.cfg ${XMLLIST} "$@"
