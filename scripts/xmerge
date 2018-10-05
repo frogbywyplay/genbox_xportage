@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (C) 2006-2016 Wyplay, All Rights Reserved.
+# Copyright (C) 2006-2018 Wyplay, All Rights Reserved.
 #
 
 from _emerge.main import parse_opts
@@ -119,6 +119,13 @@ if __name__ == "__main__":
         unmask(package='*/*')
     else:
         check_profile(sys.argv)
+
+    if '--sync' in sys.argv:
+        # Workaround to get a correct xmerge --sync
+        # indeed it will use laymansync plugin to sync target overlays
+        # but won't find them as laymansync is not aware of cross env
+        sys.argv[0] = r'/usr/bin/xlayman'
+        sys.argv = [arg.replace('--sync', '--sync-all') for arg in sys.argv]
 
     process = Popen(sys.argv, env=env)
     (stdout, stderr) = process.communicate()
